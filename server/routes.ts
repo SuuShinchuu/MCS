@@ -12,6 +12,17 @@ export function registerRoutes(app: Express): Server {
     try {
       // Log the request for debugging
       console.log('Attempting to save email:', email);
+      console.log('Using Airtable base:', process.env.AIRTABLE_BASE_ID);
+
+      const payload = {
+        records: [{
+          fields: {
+            Email: email  // Changed from "email" to "Email" to match Airtable's column name
+          }
+        }]
+      };
+
+      console.log('Sending payload to Airtable:', JSON.stringify(payload));
 
       const response = await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Emails`, {
         method: 'POST',
@@ -19,14 +30,7 @@ export function registerRoutes(app: Express): Server {
           'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          records: [{
-            fields: {
-              email: email,
-              date: new Date().toISOString()
-            }
-          }]
-        })
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {
