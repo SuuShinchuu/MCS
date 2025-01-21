@@ -10,6 +10,9 @@ export function registerRoutes(app: Express): Server {
     }
 
     try {
+      // Log the request for debugging
+      console.log('Attempting to save email:', email);
+
       const response = await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Emails`, {
         method: 'POST',
         headers: {
@@ -19,16 +22,21 @@ export function registerRoutes(app: Express): Server {
         body: JSON.stringify({
           records: [{
             fields: {
-              Email: email,
-              Date: new Date().toISOString()
+              email: email,
+              date: new Date().toISOString()
             }
           }]
         })
       });
 
       if (!response.ok) {
-        throw new Error('Error al guardar el email');
+        const errorData = await response.json();
+        console.error('Airtable API error:', errorData);
+        throw new Error(errorData.error?.message || 'Error al guardar el email');
       }
+
+      const data = await response.json();
+      console.log('Airtable response:', data);
 
       return res.json({ message: "¡Gracias por suscribirte!" });
     } catch (error) {
