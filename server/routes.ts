@@ -4,13 +4,13 @@ import { createServer, type Server } from "http";
 export function registerRoutes(app: Express): Server {
   app.post("/api/subscribe", async (req, res) => {
     const { email } = req.body;
-    
+
     if (!email || !email.includes("@")) {
       return res.status(400).json({ message: "Email inválido" });
     }
 
     try {
-      const response = await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Subscribers`, {
+      const response = await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Emails`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
